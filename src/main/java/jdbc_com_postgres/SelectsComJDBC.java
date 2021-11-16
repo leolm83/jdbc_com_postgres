@@ -1,9 +1,9 @@
 package jdbc_com_postgres;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class SelectsComJDBC {
 	public static void main(String[] args) {
@@ -11,8 +11,8 @@ public class SelectsComJDBC {
 	try (Connection con = new ConnectionFactory().criaConexao();
 			){
 	//dessa forma ele me retorna true ou false ^^
-	Statement stmt = con.createStatement();
-	boolean resultado =stmt.execute("SELECT * FROM produto");
+	PreparedStatement stmt = con.prepareStatement("SELECT * FROM produto");
+	boolean resultado =stmt.execute();
 	System.out.print("Conectado!!!");	
 	System.out.println(resultado);
 	
