@@ -1,6 +1,7 @@
 package jdbc_com_postgres;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -10,19 +11,25 @@ public class InsertsComJDBC {
 		
 	try (Connection con = new ConnectionFactory().criaConexao();
 			){
-	//dessa forma ele me retorna true ou false ^^
-	Statement stmt = con.createStatement();
-	boolean resultado =stmt.execute("INSERT INTO PRODUTO (NOME,DESCRICAO) VALUES ('MOUSE','MOUSE SEM FIO');");
-	System.out.println(resultado);//quando nao tem retorno é false !!!! (nesse caso é false pois nao foi retornado nada apenas inserido)
+	//Evitando SQLInjection
+	String nome= "Xbox SX";
+	String descricao ="Video game de ultima geracao";
+	PreparedStatement stmt = con.prepareStatement("INSERT INTO PRODUTO (NOME,DESCRICAO) VALUES (?,?)",Statement.RETURN_GENERATED_KEYS);
 	
-	//a forma de obter resposta do que foi inserido é atraves do parametro Statement.RETURN_GENERATED_KEYS
-	boolean novoResultado =stmt.execute("INSERT INTO PRODUTO (NOME,DESCRICAO) VALUES ('MOUSE','MOUSE SEM FIO');",Statement.RETURN_GENERATED_KEYS);
-	System.out.println(novoResultado);
-	ResultSet resultadoInsercaoNovoResultado = stmt.getGeneratedKeys();
-	while(resultadoInsercaoNovoResultado.next()) {
-		String nome =resultadoInsercaoNovoResultado.getString("Nome");
-		System.out.println(nome);
-	}
+	stmt.setString(1, nome);
+	stmt.setString(2, descricao);
+	Boolean resultado = stmt.execute();
+	System.out.println(resultado);
+	ResultSet idGerado = stmt.getGeneratedKeys();
+	while(idGerado.next()) {
+		
+		System.out.println("Nome Coluna 1 : "+idGerado.getMetaData().getColumnName(1));
+		System.out.println("Nome Coluna 2 : "+idGerado.getMetaData().getColumnName(2));
+		System.out.println("Nome Coluna 3 : "+idGerado.getMetaData().getColumnName(3));
+		System.out.println(idGerado.getInt("ID"));
+		System.out.println(idGerado.getString("NOME"));
+		System.out.println(idGerado.getString("DESCRICAO"));
+		}	
 	}
 	catch(SQLException e){
 		System.out.println("Ocorreu uma falha ao se conectar com o banco :");
