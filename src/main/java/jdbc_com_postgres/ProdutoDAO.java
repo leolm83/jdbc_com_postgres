@@ -7,12 +7,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class ProdutoDAO {
+	//falta um metodo de select
 	public static ProdutoDTO inserir(String nome, String descricao) {
-		PreparedStatement stmt = null;
-		try (Connection con = new ConnectionFactory().criaConexao()) {
+		try (Connection con = new ConnectionFactory().criaConexao();
+				PreparedStatement stmt = con.prepareStatement("INSERT INTO PRODUTO (NOME,DESCRICAO) VALUES (?,?)",
+						Statement.RETURN_GENERATED_KEYS);) {
 			con.setAutoCommit(false);
-			stmt = con.prepareStatement("INSERT INTO PRODUTO (NOME,DESCRICAO) VALUES (?,?)",
-					Statement.RETURN_GENERATED_KEYS);
 			stmt.setString(1, nome);
 			stmt.setString(2, descricao);
 			stmt.execute();
@@ -25,23 +25,14 @@ public class ProdutoDAO {
 			System.out.println("Ocorreu uma falha ao tentar executar a inserção!!!");
 			e.printStackTrace();
 			return null;
-		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					System.out.print("Ocorreu uma falha ao fechar o Statement!!!");
-					e.printStackTrace();
-					return null;
-				}
-			}
 		}
+
 	}
 
 	public static int deletarIgualA(int id) {
-		try (Connection con = new ConnectionFactory().criaConexao()) {
+		try (Connection con = new ConnectionFactory().criaConexao();
+				PreparedStatement stmt = con.prepareStatement("DELETE FROM PRODUTO WHERE ID = ?");) {
 			con.setAutoCommit(false);
-			PreparedStatement stmt = con.prepareStatement("DELETE FROM PRODUTO WHERE ID = ?");
 			stmt.setInt(1, id);
 			boolean resultado = stmt.execute();
 			System.out.println(resultado);
@@ -56,9 +47,9 @@ public class ProdutoDAO {
 	}
 
 	public static int deletarMaiorQue(int id) {
-		try (Connection con = new ConnectionFactory().criaConexao()) {
+		try (Connection con = new ConnectionFactory().criaConexao();
+				PreparedStatement stmt = con.prepareStatement("DELETE FROM PRODUTO WHERE ID > ?");) {
 			con.setAutoCommit(false);
-			PreparedStatement stmt = con.prepareStatement("DELETE FROM PRODUTO WHERE ID > ?");
 			stmt.setInt(1, id);
 			boolean resultado = stmt.execute();
 			con.commit();
@@ -73,9 +64,9 @@ public class ProdutoDAO {
 	}
 
 	public static int deletarMenorQue(int id) {
-		try (Connection con = new ConnectionFactory().criaConexao()) {
+		try (Connection con = new ConnectionFactory().criaConexao();
+				PreparedStatement stmt = con.prepareStatement("DELETE FROM PRODUTO WHERE ID < ?");) {
 			con.setAutoCommit(false);
-			PreparedStatement stmt = con.prepareStatement("DELETE FROM PRODUTO WHERE ID < ?");
 			stmt.setInt(1, id);
 			boolean resultado = stmt.execute();
 			con.commit();
